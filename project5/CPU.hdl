@@ -42,13 +42,9 @@ CHIP CPU {
     Or(a=isAInst, b=instruction[5], out=toARegLoad);
     ARegister(in=toAreg, load=toARegLoad, out=aRegOut, out[0..14]=addressM);
 
-    DRegister(in=aluOut, load=instruction[4], out=dRegOut);
-
     // if "a" bit(instruction[12]), load inM
-    Mux16(a=aRegOut, b=inM, sel=instruction[12], out=toALU);
-
-    Or(a=instruction[3], b=false, out=writeM);
-
+    And(a=instruction[15],b=instruction[12],out=AorM);
+    Mux16(a=aRegOut, b=inM, sel=AorM, out=toALU);
 
     ALU(x=dRegOut,
         y=toALU,
@@ -60,7 +56,33 @@ CHIP CPU {
         no=instruction[6],
         out=outM,
         out=aluOut,
-        zr=zr, 
-        ng=ng);
+        zr=isZero, 
+        ng=isNegative);
 
+	And(a=instruction[15],b=instruction[4],out=intoD);
+    DRegister(in=aluOut, load=intoD, out=dRegOut);
+
+    And(a=instruction[3], b=instruction[15], out=writeM);
+    
+    // Control
+    Not(in=isZero, out=isNotZero);
+    Not(in=isNegative, out=isNotNegative);
+    And(a=isNotZero, b=isNotNegative, out=isPositive);
+
+    // if aluOut>0 and j3 is true
+    And(a=instruction[15],b=instruction[0],out=load1);
+    And(a=isPositive, b=load1, out=jgt);
+
+    // if aluOut=zero and j2 is true
+    And(a=instruction[15],b=instruction[1],out=load2);
+    And(a=isZero, b=load2, out=jeq);
+
+    // if aluOut<0 and j1 is true
+    And(a=instruction[15],b=instruction[2],out=load3);    
+    And(a=isNegative, b=load3, out=jlt);
+
+    Or(a=jgt, b=jeq, out=jgtOrJeq);
+    Or(a=jlt, b=jgtOrJeq, out=jmp);
+    
+    PC(in=aRegOut, load=jmp, inc=true, reset=reset, out[0..14]=pc);
 }
