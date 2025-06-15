@@ -32,5 +32,9 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	//// Replace this comment with your code.
+    // determine A or C instruction using instruction[15]
+    Not(in=instruction[15], out=isAInst);
+
+    // if A instruction, load instruction to A register
+    ARegister(in=instruction, load=isAInst, out=aRegOut, out[0..14]=addressM);
 }
