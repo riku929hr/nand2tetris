@@ -35,13 +35,32 @@ CHIP CPU {
     // instruction decode
     // determine A or C instruction using instruction[15]
     Not(in=instruction[15], out=isAInst);
-
     // Routes the instruction’s MSB to the Mux16
-    Mux16(a=instruction, b=aluOut, sel=isAInst, out=toAreg);
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=toAreg);
 
-    // if A instruction, load instruction to A register
-    ARegister(in=instruction, load=isAInst, out=aRegOut, out[0..14]=addressM);
+    // if A instruction or dest bit is true, load instruction to A register
+    Or(a=isAInst, b=instruction[5], out=toARegLoad);
+    ARegister(in=toAreg, load=toARegLoad, out=aRegOut, out[0..14]=addressM);
 
-    // if "a" bit(instruction[12], load inM
+    DRegister(in=aluOut, load=instruction[4], out=dRegOut);
+
+    // if "a" bit(instruction[12]), load inM
     Mux16(a=aRegOut, b=inM, sel=instruction[12], out=toALU);
+
+    Or(a=instruction[3], b=false, out=writeM);
+
+
+    ALU(x=dRegOut,
+        y=toALU,
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f=instruction[7],
+        no=instruction[6],
+        out=outM,
+        out=aluOut,
+        zr=zr, 
+        ng=ng);
+
 }
