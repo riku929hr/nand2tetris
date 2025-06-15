@@ -32,9 +32,16 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
+    // instruction decode
     // determine A or C instruction using instruction[15]
     Not(in=instruction[15], out=isAInst);
 
+    // Routes the instruction’s MSB to the Mux16
+    Mux16(a=instruction, b=aluOut, sel=isAInst, out=toAreg);
+
     // if A instruction, load instruction to A register
     ARegister(in=instruction, load=isAInst, out=aRegOut, out[0..14]=addressM);
+
+    // if "a" bit(instruction[12], load inM
+    Mux16(a=aRegOut, b=inM, sel=instruction[12], out=toALU);
 }
