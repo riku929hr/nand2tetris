@@ -42,7 +42,18 @@ func (p *Parser) Advance() {
 }
 
 func (p *Parser) InstructionType() (InstructionType, error) {
-	return getInstructionType(p.currentLine)
+	if p.currentLine[0] == '@' {
+		return AInstruction, nil
+	}
+
+	if p.currentLine[0] == '(' && p.currentLine[len(p.currentLine)-1] == ')' {
+		return LInstruction, nil
+	}
+	if stringIndex(p.currentLine, '=') != -1 || stringIndex(p.currentLine, ';') != -1 {
+		return CInstruction, nil
+	}
+
+	return "", errors.New("parse error: unknown instruction type: " + p.currentLine)
 }
 
 func (p *Parser) Symbol() (string, error) {

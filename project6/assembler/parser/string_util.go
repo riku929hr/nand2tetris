@@ -1,24 +1,7 @@
 package parser
 
-import "errors"
-
 func isCommentLine(lineStr string) bool {
 	return lineStr[0:2] == "//"
-}
-
-func getInstructionType(lineStr string) (InstructionType, error) {
-	if lineStr[0] == '@' {
-		return AInstruction, nil
-	}
-
-	if lineStr[0] == '(' && lineStr[len(lineStr)-1] == ')' {
-		return LInstruction, nil
-	}
-	if stringIndex(lineStr, '=') != -1 || stringIndex(lineStr, ';') != -1 {
-		return CInstruction, nil
-	}
-
-	return "", errors.New("parse error: unknown instruction type: " + lineStr)
 }
 
 func removeSpaces(lineStr string) string {

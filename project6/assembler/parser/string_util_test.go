@@ -18,31 +18,6 @@ func Test_isCommentLine_returns_false_when_not_starting_with_double_slash(t *tes
 	}
 }
 
-func Test_getInstructionType(t *testing.T) {
-	tests := []struct {
-		lineStr          string
-		expectedType     InstructionType
-		expectedErrorMsg string
-	}{
-		{"@R0", AInstruction, ""},
-		{"(LOOP)", LInstruction, ""},
-		{"D=M", CInstruction, ""},
-		{"0;JMP", CInstruction, ""},
-		{"INVALID", "", "parse error: unknown instruction type: INVALID"},
-	}
-
-	for _, test := range tests {
-		result, err := getInstructionType(test.lineStr)
-		if err != nil && err.Error() != test.expectedErrorMsg {
-			t.Errorf("Expected error '%s', got '%s'", test.expectedErrorMsg, err.Error())
-			continue
-		}
-		if result != test.expectedType {
-			t.Errorf("Expected type '%s', got '%s' for line '%s'", test.expectedType, result, test.lineStr)
-		}
-	}
-}
-
 func Test_removeSpaces(t *testing.T) {
 	tests := []struct {
 		lineStr          string
