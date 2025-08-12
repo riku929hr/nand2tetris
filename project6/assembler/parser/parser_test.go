@@ -133,6 +133,9 @@ func Test_Comp_it_succeeds_for_C_instruction(t *testing.T) {
 	}{
 		{"D=M;JMP", "M"},
 		{"A=1;JGT", "1"},
+		{"D;JEQ", "D"},
+		{"0;JMP", "0"},
+		{"D=M", "M"},
 	}
 
 	for _, test := range tests {
@@ -182,7 +185,6 @@ func Test_Jump_it_fails_for_non_C_instruction(t *testing.T) {
 	}{
 		{"@R0"},
 		{"(LOOP)"},
-		{"D=M"},
 	}
 
 	for _, test := range tests {

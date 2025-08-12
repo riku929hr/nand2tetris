@@ -26,7 +26,7 @@ func NewParser(scanner *bufio.Scanner) *Parser {
 	}
 }
 
-func (p *Parser) HasMoreCommand() bool {
+func (p *Parser) HasMoreLines() bool {
 	return p.hasNext
 }
 
@@ -37,7 +37,6 @@ func (p *Parser) Advance() {
 
 	// 現在の行を取得
 	p.currentLine = p.scanner.Text()
-
 	// 次の行をチェック
 	p.hasNext = p.scanner.Scan()
 

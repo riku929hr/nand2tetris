@@ -24,7 +24,7 @@ func main() {
 
 	p := parser.NewParser(scanner)
 
-	for p.HasMoreCommand() {
+	for p.HasMoreLines() {
 		p.Advance()
 		instructionType, err := p.InstructionType()
 		if err != nil {
