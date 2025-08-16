@@ -1,7 +1,6 @@
 package parser_test
 
 import (
-	"bufio"
 	"strings"
 	"testing"
 
@@ -19,8 +18,7 @@ func Test_InstructionType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		result, _ := p.InstructionType()
 		if result != test.expected {
@@ -30,8 +28,7 @@ func Test_InstructionType(t *testing.T) {
 }
 
 func Test_InstructionType_it_fails_for_unknown_instruction(t *testing.T) {
-	scanner := bufio.NewScanner(strings.NewReader("INVALID"))
-	p := parser.NewParser(scanner)
+	p := parser.NewParser(strings.NewReader("INVALID"))
 	p.Advance()
 	_, err := p.InstructionType()
 	if err == nil {
@@ -49,8 +46,7 @@ func Test_Symbol_it_succeeds_if_A_or_L_instruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		result, err := p.Symbol()
 		if err != nil && test.expected != "" {
@@ -72,8 +68,7 @@ func Test_Symbol_it_fails_if_not_A_or_L_instruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		_, err := p.Symbol()
 		if err == nil {
@@ -93,8 +88,7 @@ func Test_Dest_it_succeeds_for_C_instruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		result, err := p.Dest()
 		if err != nil && test.expected != "" {
@@ -116,8 +110,7 @@ func Test_Dest_it_fails_for_non_C_instruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		_, err := p.Dest()
 		if err == nil {
@@ -139,8 +132,7 @@ func Test_Comp_it_succeeds_for_C_instruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		result, err := p.Comp()
 		if err != nil && test.expected != "" {
@@ -165,8 +157,7 @@ func Test_Jump_it_succeeds_for_C_instruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		result, err := p.Jump()
 		if err != nil && test.expected != "" {
@@ -188,8 +179,7 @@ func Test_Jump_it_fails_for_non_C_instruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scanner := bufio.NewScanner(strings.NewReader(test.line))
-		p := parser.NewParser(scanner)
+		p := parser.NewParser(strings.NewReader(test.line))
 		p.Advance()
 		_, err := p.Jump()
 		if err == nil {

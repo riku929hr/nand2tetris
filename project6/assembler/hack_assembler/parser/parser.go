@@ -3,6 +3,7 @@ package parser
 import (
 	"bufio"
 	"errors"
+	"io"
 )
 
 type InstructionType string
@@ -19,9 +20,9 @@ type Parser struct {
 	hasNext     bool
 }
 
-func NewParser(scanner *bufio.Scanner) *Parser {
-	return &Parser{
-		scanner: scanner,
+func NewParser(reader io.Reader) Parser {
+	return Parser{
+		scanner: bufio.NewScanner(reader),
 		hasNext: true,
 	}
 }

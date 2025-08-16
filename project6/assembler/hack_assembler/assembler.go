@@ -2,7 +2,9 @@ package hack_assembler
 
 import (
 	"fmt"
+	"io"
 	"strconv"
+	"strings"
 
 	"github.com/riku929hr/nand2tetris/assembler/hack_assembler/code"
 	"github.com/riku929hr/nand2tetris/assembler/hack_assembler/parser"
@@ -10,19 +12,81 @@ import (
 )
 
 type Assembler struct {
-	Parser      *parser.Parser
+	content     string
 	SymbolTable *symboltable.SymbolTable
 }
 
-func NewAssembler(p *parser.Parser, st *symboltable.SymbolTable) *Assembler {
+func NewAssembler(reader io.Reader, st *symboltable.SymbolTable) *Assembler {
+	content, _ := io.ReadAll(reader)
 	return &Assembler{
-		Parser:      p,
+		content:     string(content),
 		SymbolTable: st,
 	}
 }
 
+func (a *Assembler) FirstPass() error {
+	p := parser.NewParser(strings.NewReader(a.content))
+	st := a.SymbolTable
+
+	currentLineNumber := 0
+
+	for p.HasMoreLines() {
+		p.Advance()
+		instructionType, err := p.InstructionType()
+		if err != nil {
+			return err
+		}
+
+		if instructionType == parser.LInstruction {
+			symbol, err := p.Symbol()
+			if err != nil {
+				return err
+			}
+			st.AddEntry(symbol, currentLineNumber+1)
+		}
+		currentLineNumber++
+	}
+	return nil
+}
+
+func (a *Assembler) SecondPass() error {
+	p := parser.NewParser(strings.NewReader(a.content))
+	st := a.SymbolTable
+
+	currentVariableAddress := 16
+
+	for p.HasMoreLines() {
+		p.Advance()
+		instructionType, err := p.InstructionType()
+		if err != nil {
+			return err
+		}
+
+		if instructionType == parser.AInstruction {
+			symbol, err := p.Symbol()
+			if err != nil {
+				return err
+			}
+
+			if _, err := strconv.Atoi(symbol); err != nil { // If symbol is not a number
+				if !st.Contains(symbol) {
+					st.AddEntry(symbol, currentVariableAddress)
+					currentVariableAddress++
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func (a *Assembler) Assemble() (string, error) {
-	p := a.Parser
+	if err := a.FirstPass(); err != nil {
+		return "", err
+	}
+	if err := a.SecondPass(); err != nil {
+		return "", err
+	}
+	p := parser.NewParser(strings.NewReader(a.content))
 	for p.HasMoreLines() {
 		p.Advance()
 		instructionType, err := p.InstructionType()
@@ -35,6 +99,7 @@ func (a *Assembler) Assemble() (string, error) {
 			if err != nil {
 				return "", err
 			}
+
 			decimal, _ := strconv.ParseInt(symbol, 10, 64)
 			binaryString := fmt.Sprintf("%016b", decimal)
 			fmt.Println(binaryString)
