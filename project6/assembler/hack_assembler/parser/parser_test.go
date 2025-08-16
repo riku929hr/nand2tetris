@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/riku929hr/nand2tetris/assembler/parser" // Adjust the import path as necessary
+	"github.com/riku929hr/nand2tetris/assembler/hack_assembler/parser" // Adjust the import path as necessary
 )
 
 func Test_InstructionType(t *testing.T) {
