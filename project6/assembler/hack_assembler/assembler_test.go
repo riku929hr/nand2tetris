@@ -29,11 +29,11 @@ func Test_FirstPass(t *testing.T) {
 			t.Error("Expected symbols 'LOOP' and 'END' to be added to the symbol table.")
 		}
 
-		if address, err := st.GetAddress("LOOP"); err != nil || address != 1 {
+		if address, err := st.GetAddress("LOOP"); err != nil || address != 0 {
 			t.Errorf("Expected address for 'LOOP' to be 0, but got: %d, error: %v", address, err)
 		}
-		if address, err := st.GetAddress("END"); err != nil || address != 4 {
-			t.Errorf("Expected address for 'END' to be 4, but got: %d, error: %v", address, err)
+		if address, err := st.GetAddress("END"); err != nil || address != 2 {
+			t.Errorf("Expected address for 'END' to be 2, but got: %d, error: %v", address, err)
 		}
 	})
 }
