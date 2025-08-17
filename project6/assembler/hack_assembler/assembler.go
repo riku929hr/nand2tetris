@@ -42,9 +42,12 @@ func (a *Assembler) FirstPass() error {
 			if err != nil {
 				return err
 			}
-			st.AddEntry(symbol, currentLineNumber+1)
+			// Label points to the next instruction address
+			st.AddEntry(symbol, currentLineNumber)
+		} else {
+			// Only count A and C instructions as actual code lines
+			currentLineNumber++
 		}
-		currentLineNumber++
 	}
 	return nil
 }
@@ -94,13 +97,30 @@ func (a *Assembler) Assemble() (string, error) {
 			return "", err
 		}
 
+		// Skip L instructions (labels) as they don't generate machine code
+		if instructionType == parser.LInstruction {
+			continue
+		}
+
 		if instructionType == parser.AInstruction {
 			symbol, err := p.Symbol()
 			if err != nil {
 				return "", err
 			}
 
-			decimal, _ := strconv.ParseInt(symbol, 10, 64)
+			var decimal int64
+			if num, err := strconv.Atoi(symbol); err == nil {
+				// Symbol is a number
+				decimal = int64(num)
+			} else {
+				// Symbol is a variable or label, get from symbol table
+				if addr, err := a.SymbolTable.GetAddress(symbol); err == nil {
+					decimal = int64(addr)
+				} else {
+					return "", fmt.Errorf("undefined symbol: %s", symbol)
+				}
+			}
+
 			binaryString := fmt.Sprintf("%016b", decimal)
 			fmt.Println(binaryString)
 		}

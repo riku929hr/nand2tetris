@@ -22,5 +22,8 @@ func main() {
 		symboltable.NewSymbolTable(),
 	)
 
-	assembler.Assemble()
+	_, err = assembler.Assemble()
+	if err != nil {
+		fmt.Printf("Assembly error: %v\n", err)
+	}
 }

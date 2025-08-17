@@ -1,7 +1,7 @@
 package parser
 
 func isCommentLine(lineStr string) bool {
-	if lineStr == "" {
+	if len(lineStr) < 2 {
 		return false
 	}
 	return lineStr[0:2] == "//"

@@ -21,9 +21,11 @@ type Parser struct {
 }
 
 func NewParser(reader io.Reader) Parser {
+	scanner := bufio.NewScanner(reader)
+	hasNext := scanner.Scan() // Check if there's at least one line
 	return Parser{
-		scanner: bufio.NewScanner(reader),
-		hasNext: true,
+		scanner: scanner,
+		hasNext: hasNext,
 	}
 }
 
@@ -36,22 +38,24 @@ func (p *Parser) Advance() {
 		return
 	}
 
-	// 現在の行を取得
-	p.currentLine = p.scanner.Text()
-	// 次の行をチェック
+	spaceRemoved := removeSpaces(p.scanner.Text())
 	p.hasNext = p.scanner.Scan()
 
-	if isCommentLine(p.currentLine) {
-		p.Advance() // recursively call Advance to skip comments
+	if isCommentLine(spaceRemoved) {
+		if p.hasNext {
+			p.Advance() // recursively call Advance to skip comments
+		}
 		return
 	}
 
-	// if includes space, remove them all
-	p.currentLine = removeSpaces(p.currentLine)
-	if p.currentLine == "" {
-		p.Advance() // skip empty lines
+	if spaceRemoved == "" {
+		if p.hasNext {
+			p.Advance() // skip empty lines
+		}
 		return
 	}
+
+	p.currentLine = spaceRemoved
 }
 
 func (p *Parser) InstructionType() (InstructionType, error) {
