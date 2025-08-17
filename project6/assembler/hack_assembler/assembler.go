@@ -141,10 +141,21 @@ func (a *Assembler) Assemble() (string, error) {
 				return "", err
 			}
 			// Convert comp, dest, and jump to binary
-			compBinary := code.Comp(comp)
-			destBinary := code.Dest(dest)
-			jumpBinary := code.Jump(jump)
-			fmt.Println("1110" + compBinary + destBinary + jumpBinary)
+			compBinary, err := code.Comp(comp)
+			if err != nil {
+				return "", err
+			}
+
+			destBinary, err := code.Dest(dest)
+			if err != nil {
+				return "", err
+			}
+
+			jumpBinary, err := code.Jump(jump)
+			if err != nil {
+				return "", err
+			}
+			fmt.Println("111" + compBinary + destBinary + jumpBinary)
 		}
 	}
 	return "success", nil

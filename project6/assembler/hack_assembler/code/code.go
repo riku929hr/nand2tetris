@@ -3,89 +3,80 @@
 // It includes functions for A-instructions, C-instructions, and jump/dest/comp codes.
 package code
 
-func Dest(dest string) string {
-	switch dest {
-	case "null":
-		return "000"
-	case "M":
-		return "001"
-	case "D":
-		return "010"
-	case "MD":
-		return "011"
-	case "A":
-		return "100"
-	case "AM":
-		return "101"
-	case "AD":
-		return "110"
-	case "ADM":
-		return "111"
-	}
-	return "000" // invalid dest, return null
+import (
+	"errors"
+)
+
+var destMap = map[string]string{
+	"":     "000", // when dest is omitted, it defaults to "000"
+	"null": "000",
+	"M":    "001",
+	"D":    "010",
+	"MD":   "011",
+	"A":    "100",
+	"AM":   "101",
+	"AD":   "110",
+	"ADM":  "111",
 }
 
-func Comp(comp string) string {
-	switch comp {
-	case "0":
-		return "101010"
-	case "1":
-		return "111111"
-	case "-1":
-		return "111010"
-	case "D":
-		return "001100"
-	case "A":
-		return "110000"
-	case "!D":
-		return "001101"
-	case "!A":
-		return "110001"
-	case "-D":
-		return "001111"
-	case "-A":
-		return "110011"
-	case "D+1":
-		return "011111"
-	case "A+1":
-		return "110111"
-	case "D-1":
-		return "001110"
-	case "A-1":
-		return "110010"
-	case "D+A":
-		return "000010"
-	case "D-A":
-		return "010011"
-	case "A-D":
-		return "000111"
-	case "D&A":
-		return "000000"
-	case "D|A":
-		return "010101"
-	default:
-		return ""
+func Dest(dest string) (string, error) {
+	if value, exists := destMap[dest]; exists {
+		return value, nil
 	}
+	return "", errors.New("invalid dest: " + dest)
 }
 
-func Jump(jump string) string {
-	switch jump {
-	case "null":
-		return "000"
-	case "JGT":
-		return "001"
-	case "JEQ":
-		return "010"
-	case "JGE":
-		return "011"
-	case "JLT":
-		return "100"
-	case "JNE":
-		return "101"
-	case "JLE":
-		return "110"
-	case "JMP":
-		return "111"
+var compMap = map[string]string{
+	"0":   "0101010",
+	"1":   "0111111",
+	"-1":  "0111010",
+	"D":   "0001100",
+	"A":   "0110000",
+	"M":   "1110000",
+	"!D":  "0001101",
+	"!A":  "0110001",
+	"-D":  "0001111",
+	"-A":  "0110011",
+	"D+1": "0011111",
+	"A+1": "0110111",
+	"M+1": "1110111",
+	"D-1": "0001110",
+	"A-1": "0110010",
+	"M-1": "1110010",
+	"D+A": "0000010",
+	"D+M": "1000010",
+	"D-A": "0010011",
+	"D-M": "1010011",
+	"A-D": "0000111",
+	"M-D": "1000111",
+	"D&A": "0000000",
+	"D&M": "1000000",
+	"D|A": "0010101",
+	"D|M": "1010101",
+}
+
+func Comp(comp string) (string, error) {
+	if value, exists := compMap[comp]; exists {
+		return value, nil
 	}
-	return "000"
+	return "", errors.New("invalid comp: " + comp)
+}
+
+var jumpMap = map[string]string{
+	"":     "000", // when jump is omitted, it defaults to "000"
+	"null": "000",
+	"JGT":  "001",
+	"JEQ":  "010",
+	"JGE":  "011",
+	"JLT":  "100",
+	"JNE":  "101",
+	"JLE":  "110",
+	"JMP":  "111",
+}
+
+func Jump(jump string) (string, error) {
+	if value, exists := jumpMap[jump]; exists {
+		return value, nil
+	}
+	return "", errors.New("invalid jump: " + jump)
 }
