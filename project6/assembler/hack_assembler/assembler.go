@@ -61,7 +61,7 @@ func (a *Assembler) FirstPass() error {
 	return nil
 }
 
-func (a *Assembler) Assemble() (string, error) {
+func (a *Assembler) Assemble(writer io.Writer) (string, error) {
 	if err := a.FirstPass(); err != nil {
 		return "", err
 	}
@@ -96,22 +96,21 @@ func (a *Assembler) Assemble() (string, error) {
 				currentVariableAddress++
 			}
 
-			var decimal int64
 			if isNumber(symbol) {
 				// Symbol is a number, convert to int64
 				num, _ := strconv.ParseInt(symbol, 10, 64)
-				decimal = int64(num)
-			} else {
-				// Symbol is a variable or label, get from symbol table
-				if addr, err := a.SymbolTable.GetAddress(symbol); err == nil {
-					decimal = int64(addr)
-				} else {
-					return "", fmt.Errorf("undefined symbol: %s", symbol)
-				}
+				binaryString := fmt.Sprintf("%016b", num)
+				writer.Write([]byte(binaryString + "\n"))
+				continue
 			}
 
-			binaryString := fmt.Sprintf("%016b", decimal)
-			fmt.Println(binaryString)
+			address, err := a.SymbolTable.GetAddress(symbol)
+			if err != nil {
+				return "", fmt.Errorf("undefined symbol: %s", symbol)
+			}
+
+			binaryString := fmt.Sprintf("%016b", int64(address))
+			writer.Write([]byte(binaryString + "\n"))
 		}
 
 		if instructionType == parser.CInstruction {
@@ -144,7 +143,7 @@ func (a *Assembler) Assemble() (string, error) {
 			if err != nil {
 				return "", err
 			}
-			fmt.Println("111" + compBinary + destBinary + jumpBinary)
+			writer.Write([]byte("111" + compBinary + destBinary + jumpBinary + "\n"))
 		}
 	}
 	return "success", nil
