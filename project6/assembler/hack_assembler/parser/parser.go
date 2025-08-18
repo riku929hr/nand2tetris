@@ -108,7 +108,6 @@ func (p *Parser) Dest() (string, error) {
 		return "", errors.New("not C instruction")
 	}
 
-	// dest=comp;jumpの=の前までを取得して返す
 	equalIndex := stringIndex(p.currentLine, '=')
 
 	// If there is no equal sign, it means there is no dest instruction
@@ -131,7 +130,6 @@ func (p *Parser) Comp() (string, error) {
 	if instructionType != CInstruction {
 		return "", errors.New("not C instruction")
 	}
-	// dest=comp;jumpの=の後から;までを取得して返す
 	semicolonIndex := stringIndex(p.currentLine, ';')
 
 	// If there is no semicolon, it means there is no jump instruction
@@ -159,7 +157,6 @@ func (p *Parser) Jump() (string, error) {
 		return "", errors.New("not C instruction")
 	}
 
-	// dest=comp;jumpの;の後を取得して返す
 	semicolonIndex := stringIndex(p.currentLine, ';')
 
 	// If there is no semicolon, it means there is no jump instruction
