@@ -90,8 +90,13 @@ func (a *Assembler) Assemble() (string, error) {
 		return "", err
 	}
 	p := parser.NewParser(strings.NewReader(a.content))
-	for p.HasMoreLines() {
+	for {
 		p.Advance()
+
+		if !p.HasMoreLines() {
+			break
+		}
+
 		instructionType, err := p.InstructionType()
 		if err != nil {
 			return "", err
