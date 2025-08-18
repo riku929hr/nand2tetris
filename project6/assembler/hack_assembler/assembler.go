@@ -11,6 +11,15 @@ import (
 	symboltable "github.com/riku929hr/nand2tetris/assembler/hack_assembler/symbol_table"
 )
 
+func isNumber(s string) bool {
+	for _, char := range s {
+		if char < '0' || char > '9' {
+			return false
+		}
+	}
+	return len(s) > 0 // ensure it's not an empty string
+}
+
 type Assembler struct {
 	content     string
 	SymbolTable *symboltable.SymbolTable
@@ -52,43 +61,12 @@ func (a *Assembler) FirstPass() error {
 	return nil
 }
 
-func (a *Assembler) SecondPass() error {
-	p := parser.NewParser(strings.NewReader(a.content))
-	st := a.SymbolTable
-
-	currentVariableAddress := 16
-
-	for p.HasMoreLines() {
-		p.Advance()
-		instructionType, err := p.InstructionType()
-		if err != nil {
-			return err
-		}
-
-		if instructionType == parser.AInstruction {
-			symbol, err := p.Symbol()
-			if err != nil {
-				return err
-			}
-
-			if _, err := strconv.Atoi(symbol); err != nil { // If symbol is not a number
-				if !st.Contains(symbol) {
-					st.AddEntry(symbol, currentVariableAddress)
-					currentVariableAddress++
-				}
-			}
-		}
-	}
-	return nil
-}
-
 func (a *Assembler) Assemble() (string, error) {
 	if err := a.FirstPass(); err != nil {
 		return "", err
 	}
-	if err := a.SecondPass(); err != nil {
-		return "", err
-	}
+	currentVariableAddress := 16
+
 	p := parser.NewParser(strings.NewReader(a.content))
 	for {
 		p.Advance()
@@ -113,9 +91,15 @@ func (a *Assembler) Assemble() (string, error) {
 				return "", err
 			}
 
+			if isNumber(symbol) && !a.SymbolTable.Contains(symbol) {
+				a.SymbolTable.AddEntry(symbol, currentVariableAddress)
+				currentVariableAddress++
+			}
+
 			var decimal int64
-			if num, err := strconv.Atoi(symbol); err == nil {
-				// Symbol is a number
+			if isNumber(symbol) {
+				// Symbol is a number, convert to int64
+				num, _ := strconv.ParseInt(symbol, 10, 64)
 				decimal = int64(num)
 			} else {
 				// Symbol is a variable or label, get from symbol table

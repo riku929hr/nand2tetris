@@ -12,7 +12,7 @@ import (
 func main() {
 	// filepath from args
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run main.go <path_to_asm_file>")
+		fmt.Println("Usage: assembler [path_to_asm_file]")
 		return
 	}
 	filePath := os.Args[1]
